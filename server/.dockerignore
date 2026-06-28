@@ -1,0 +1,6 @@
+*.md
+compose.dev.yml
+.env*
+.git/
+.gitignore
+DATA.md

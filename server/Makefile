@@ -1,0 +1,19 @@
+.PHONY: build test lint lint-fix lint-new fmt
+
+build:
+	go build ./...
+
+test:
+	go test ./...
+
+lint:
+	golangci-lint run ./...
+
+lint-fix:
+	golangci-lint run --fix ./...
+
+lint-new:
+	golangci-lint run --new-from-rev=origin/main ./...
+
+fmt:
+	golangci-lint fmt ./...

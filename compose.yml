@@ -1,0 +1,64 @@
+# Default deployment
+
+services:
+  server:
+    env_file: .env
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: futurecast-server:latest
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ./config.yml:/app/config.yml:ro
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - futurecast
+
+  # Local Database(Optional)
+  #
+  # db:
+  #   env_file: .env
+  #   image: postgres:18-alpine
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  #   ports:
+  #     - "${DATABASE_PORT}"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - futurecast
+
+  # Local Inference(Optional)
+  #
+  # Skip if config.yml inference.type=api in config.yaml
+  #
+  # inference:
+  #   env_file: .env
+  #   build:
+  #     context: ./inference
+  #     dockerfile: Dockerfile
+  #   image: futurecast-inference:latest
+  #   ports:
+  #     - "${INFERENCE_PORT}:${INFERENCE_PORT}"
+  #   volumes:
+  #     - model-cache:/home/app/.cache/huggingface
+  #   restart: unless-stopped
+  #   networks:
+  #     - futurecast
+
+# volumes:
+#   db-data:
+#     name: futurecast-db-data
+#   model-cache:
+#     name: futurecast-model-cache
+
+networks:
+  futurecast:
+    name: futurecast-net

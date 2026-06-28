@@ -1,0 +1,49 @@
+# ───────────── secrets / runtime config ─────────────
+.env
+.env.*
+!.env.example
+config.yaml
+config.yml
+config.toml
+
+# ───────────── Go build artefacts ─────────────
+/server/futurecast
+/server/server
+*.test
+*.out
+*.exe
+/dist/
+/build/
+vendor/
+
+# ───────────── Python (inference) ─────────────
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ───────────── docker / compose ─────────────
+docker-compose.override.yml
+
+# ───────────── logs / scratch ─────────────
+*.log
+/logs/
+/tmp/
+*.bak
+*.swp
+*.tmp
+
+# ───────────── test artefacts ─────────────
+coverage.out
+/test/*/.env.test
+
+# ───────────── editor / OS ─────────────
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db

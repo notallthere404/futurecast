@@ -1,0 +1,121 @@
+# Local dev runs the full ruleset (~200 baseline issues are tech debt).
+# CI uses `--new-from-rev=origin/main` to only fail on NEW issues.
+# See server/Makefile and .github/workflows/lint.yml.
+version: "2"
+run:
+  concurrency: 4
+  timeout: 5m
+  tests: true
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 50
+
+linters:
+  enable:
+    # correctness
+    - govet
+    - staticcheck
+    - unused
+    - errcheck
+    - errorlint
+    - nilerr
+    - forcetypeassert
+    - copyloopvar
+    - durationcheck
+    - reassign
+    # style
+    - gocritic
+    - revive
+    - whitespace
+    - godot
+    - misspell
+    - dupword
+    - predeclared
+    - errname
+    - asciicheck
+    # complexity
+    - gocyclo
+    - nestif
+    - funlen
+    - dupl
+    # performance
+    - perfsprint
+    - unconvert
+    - ineffassign
+    - goconst
+    # security & resources
+    - gosec
+    - bidichk
+    - bodyclose
+    - noctx
+    - containedctx
+    - fatcontext
+    - sqlclosecheck
+    - rowserrcheck
+    # logging
+    - sloglint
+    - loggercheck
+    # testing
+    - testifylint
+    - thelper
+    - usetesting
+    # modernization & meta
+    - exptostd
+    - intrange
+    - usestdlibvars
+    - exhaustive
+    - nolintlint
+
+  disable:
+    - wsl_v5           # too opinionated on blank-line placement for this codebase
+    - paralleltest     # tests intentionally sequential (DB state, shared schema)
+    - modernize        # very noisy on a Go 1.25 codebase already using modern idioms
+
+  exclusions:
+    paths:
+      - vendor$
+      - third_party$
+    rules:
+      # generated SQL embeds and migrations
+      - path: pkg/db/sql/
+        linters:
+          - dupl
+      # main and cmd packages can have longer init funcs
+      - path: cmd/
+        linters:
+          - funlen
+          - gocyclo
+
+  settings:
+    dupl:
+      threshold: 100
+    errcheck:
+      check-type-assertions: true
+    funlen:
+      lines: 120
+      statements: 80
+    goconst:
+      min-len: 3
+      min-occurrences: 4
+    gocyclo:
+      min-complexity: 15
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    gosec:
+      excludes:
+        - G104  # errcheck already covers unchecked errors
+        - G304  # file inclusion via variable — config loader needs this
+
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+  settings:
+    gofumpt:
+      extra-rules: true
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$

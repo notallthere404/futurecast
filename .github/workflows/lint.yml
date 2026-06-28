@@ -1,0 +1,31 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  golangci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # need history for --new-from-rev
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          version: v2.6.2
+          working-directory: server
+          # Fail only on NEW issues vs main. Existing baseline is tech debt.
+          # Drop --new-from-rev once baseline is cleared to enforce repo-wide.
+          args: --new-from-rev=origin/main --timeout=5m
