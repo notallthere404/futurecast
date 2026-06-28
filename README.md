@@ -1,6 +1,6 @@
 # FutureCast
 
-[![Build](https://img.shields.io/github/actions/workflow/status/notallthere404/futurecast/release.yml?branch=main&label=build)](https://github.com/notallthere404/futurecast/actions/workflows/release.yml) [![Go Version](https://img.shields.io/github/go-mod/go-version/notallthere404/futurecast?filename=server/go.mod)](https://go.dev/) [![License](https://img.shields.io/github/license/notallthere404/futurecast)](./LICENSE) [![Release](https://img.shields.io/github/v/release/notallthere404/futurecast?include_prereleases&sort=semver)](https://github.com/notallthere404/futurecast/releases) [![Go Report Card](https://goreportcard.com/badge/github.com/notallthere404/futurecast/server)](https://goreportcard.com/report/github.com/notallthere404/futurecast/server)
+[![Build](https://img.shields.io/github/actions/workflow/status/notallthere404/futurecast/release.yml?branch=main&label=build)](https://github.com/notallthere404/futurecast/actions/workflows/release.yml) [![Go Version](https://img.shields.io/github/go-mod/go-version/notallthere404/futurecast?filename=server/go.mod)](https://go.dev/) [![License](https://img.shields.io/github/license/notallthere404/futurecast)](./LICENSE) [![Status](https://img.shields.io/badge/status-pre--release-orange)](https://github.com/notallthere404/futurecast/releases) [![Go Report Card](https://goreportcard.com/badge/github.com/notallthere404/futurecast/server)](https://goreportcard.com/report/github.com/notallthere404/futurecast/server)
 
 FutureCast is an open source framework built upon Large Language Models(LLMs) that ingests articles from sources classifies them with a model of your choice.
 
@@ -16,7 +16,7 @@ For the how, see [architecture](docs/architecture.md).
 
 ## Getting Started
 
-You can run FutureCast in Docker or from Source. See how in our published [installation](docs/installation.md) guide.
+You can run FutureCast in Docker or from source. See how in our published [installation](docs/installation.md) guide.
 
 ## Roadmap
 
