@@ -179,9 +179,9 @@ func TestManager_LoadValid(t *testing.T) {
 func TestManager_LoadMissingFile(t *testing.T) {
 	// Uses t.Setenv; cannot t.Parallel.
 
-	// Force auto-search mode to find nothing: point HOME at an empty
-	// directory so AddConfigPath("$HOME/ng-tm/") matches no file.
-	t.Setenv("HOME", t.TempDir())
+	// Force auto-search mode to find nothing: chdir to an empty
+	// directory so AddConfigPath(".") matches no file.
+	t.Chdir(t.TempDir())
 
 	cm, err := Init("")
 	if err != nil {

@@ -60,7 +60,7 @@ func Init(path string) (*Manager, error) {
 	} else {
 		cm.v.SetConfigName("config")
 		cm.v.SetConfigType("yml")
-		cm.v.AddConfigPath("$HOME/ng-tm/")
+		cm.v.AddConfigPath(".")
 	}
 
 	cm.v.SetEnvPrefix("FTC")

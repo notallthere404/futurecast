@@ -1,142 +1,53 @@
-# FutureCast configuration. Every field is shown commented out; the
-# server applies defaults for anything omitted. Copy to config.yaml and
-# uncomment what you actually need.
-#
-# Resolution order: explicit Set > env var (FTC_ prefix) > config file
-# > built-in default. ${VAR} expansion inside YAML strings is resolved
-# at load time against the process environment.
-
-# ───────────── server ─────────────
 server:
-  # host: "0.0.0.0"
-  # port: 8000
-  # log_level: "info"          # debug | info | warn | error
-  # ext_db: ""                 # DSN; falls back to DATABASE_URL env var
+  host: "0.0.0.0"
+  port: 8000
+  log_level: info
+  # ext_db:                  # Falls back to DATABASE_URL env var
 
-# ───────────── source ─────────────
-# Inherited defaults plus per-kind source instances. Per-source values
-# override the defaults; lists and maps REPLACE (no merge).
 source:
-  # default:
-  #   schedule: "*/10 * * * *"
-  #   trust: "medium"          # unknown | low | medium | high
-  #   timeout_seconds: 30
-  #   infer: ["events"]        # classifications every source feeds
-  #   filter:
-  #     - "content.len.gte.100"
-  #     - "content.len.lte.5000"
-  #     - "!title.contains.eq.spam"
+  default:
+    schedule: "* * * * *"
+    trust: "medium"
+    timeout_seconds: 30
+    infer: ["events"]
+    filter:
+      - "content.len.gte.100"
+      - "content.len.lte.5000"
   #   retry:
   #     max: 3
   #     backoff_ms: 500
   #     max_delay_ms: 30000
-  #   headers:
-  #     Accept: "application/rss+xml"
 
-  # rss:
-  #   - name: "CISA"
-  #     url: "https://www.cisa.gov/cybersecurity-advisories/all.xml"
-  #     target: "description"  # content | description | link
-  #     limit: 0               # 0 = no cap
-  #     active: true
-  #     trust: "high"
-  #     # Optional override of any inherited default:
-  #     # schedule: "*/30 * * * *"
-  #     # filter: []           # set to [] to disable inherited filters
-  #     # paths: ["*"]         # only when target: link
-  #     # selectors:
-  #     #   title: ["h1.entry-title"]
-  #     #   content: ["#article-body"]
+  rss:
+    - name: "CISA"
+      url: "https://www.cisa.gov/cybersecurity-advisories/all.xml"
+      target: "description"     # content | description | link
+      limit: 0                # 0 = no cap
+      active: true
+      trust: "high"
+      # Optional override of any inherited default:
+      # schedule: "*/30 * * * *"
+      # filter: []
 
-  # http:
-  #   - name: "VirusTotal"
-  #     url: "https://www.virustotal.com/api/v3/intelligence/hunting_notification_files"
-  #     method: "GET"
-  #     active: true
-  #     query:
-  #       limit: "100"
-  #     # body: '{"query":"type:incident"}'
-  #     auth:
-  #       kind: "api_key"      # bearer | api_key | basic | header | hmac
-  #       header: "x-apikey"
-  #       token: "${VT_API_KEY}"
-  #     extract:
-  #       items: "data"        # JSON path to the array of records
-  #       title: "attributes.meaningful_name"
-  #       content: "attributes.last_analysis_stats"
-  #       timestamp: "attributes.last_analysis_date"
-  #       link: "attributes.url"
-  #     pagination:
-  #       cursor_path: "meta.cursor"
-  #       page_param: "cursor"
-  #       max_pages: 10
-
-  # webhook:
-  #   - name: "Alerts"
-  #     path: "/alerts"        # full route is /webhooks/alerts
-  #     method: "POST"
-  #     content_type: "application/json"
-  #     max_body_bytes: 1048576
-  #     active: true
-  #     auth:
-  #       kind: "hmac"
-  #       header: "X-Signature"
-  #       secret: "${WEBHOOK_SECRET}"
-  #     extract:
-  #       title: "title"
-  #       content: "content"
-  #       timestamp: "timestamp"
-  #       link: "link"
-
-  # websocket:
-  #   # Schema only — driver not yet implemented.
-  #   - name: "Live"
-  #     url: "wss://example.com/stream"
-  #     active: true
-  #     protocols: ["v2", "v1"]
-  #     subscribe: '{"action":"subscribe","topic":"alerts"}'
-  #     message_type: "json"   # json | text | binary
-  #     buffer_size: 1024
-  #     heartbeat:
-  #       interval_ms: 30000
-  #       timeout_ms: 10000
-  #     reconnect:
-  #       enabled: true
-  #       backoff_ms: 1000
-  #       max_delay_ms: 60000
-
-# ───────────── inference ─────────────
 inference:
-  # mode: continuous           # continuous | manual
-  # type: zeroshot             # zeroshot | llm | api
-  # engine: transformers       # self-hosted runtime; ignored for type=api
-  # addr: "http://inference:8080"  # Python service base URL (zeroshot/llm)
-  # model: "MoritzLaurer/deberta-v3-base-zeroshot-v2.0"
-
-  # Required only when type=api. Endpoint must be OpenAI chat-completion
-  # compatible. Bearer auth is set automatically from api_key.
-  # api:
-  #   endpoint: "https://openrouter.ai/api/v1"
-  #   api_key: "${OPENROUTER_API_KEY}"
-  #   model_override: ""       # empty = use top-level model
-
-  # default:
-  #   cutoff: 0.0              # drop labels below this score
-  #   top_n: 3                 # cap labels returned per attribute
-
-  # Dynamic top-level keys under inference: each one creates a
-  # classification table named after the key. Source `infer:` entries
-  # reference these names.
-  # events:
-  #   - name: tactic
-  #     prompt: "{label}: {definition}"
-  #     instruction: "Determine whether the document describes the following tactic."
-  #     # cutoff: 0.5          # overrides default.cutoff for this attribute
-  #     # top_n: 5             # overrides default.top_n
-  #     labels:
-  #       - name: "Reconnaissance"
-  #         definition: "Pre-attack intelligence gathering."
-  #       - name: "Initial Access"
-  #         definition: "Gaining a foothold in the target environment."
-  #       # Short-form (no definition) also works:
-  #       # - "Persistence"
+  mode: continuous
+  type: zeroshot
+  engine: transformers
+  addr: http://inference:8080
+  model: knowledgator/gliclass-base-v3.0
+  default:
+    cutoff: 0.0
+    top_n: 3
+  events:
+    - name: tactics
+      instruction: You are a cyber threat intelligence analyst. Determine if the document describes the following technical procedure, tactic, or vulnerability.
+      # cutoff: 0.5          # overrides default.cutoff for this attribute
+      # top_n: 5             # overrides default.top_n
+      labels: 
+        - "Reconnaissance and Scanning"
+        - "Resource Development and Infrastructure" 
+        - "Initial Access"
+        - "Execution"
+        - "Persistence and Account Controls"
+        - "Privilege Escalation and Account Compromise"
+        - "Exploitation and Vulnerabilities"

@@ -10,7 +10,7 @@ services:
     ports:
       - "${PORT}:${PORT}"
     volumes:
-      - ./config.yml:/app/config.yml:ro
+      - ./config.yml:/app/config.yml
     # depends_on:
     #   db:
     #     condition: service_healthy
@@ -18,13 +18,13 @@ services:
     networks:
       - futurecast
 
-  # Local Database(Optional)
+  # Database (Optional)
   #
   # db:
   #   env_file: .env
   #   image: postgres:18-alpine
   #   volumes:
-  #     - db-data:/var/lib/postgresql/data
+  #     - db-data:/var/lib/postgresql
   #   ports:
   #     - "${DATABASE_PORT}"
   #   healthcheck:
@@ -35,9 +35,7 @@ services:
   #   networks:
   #     - futurecast
 
-  # Local Inference(Optional)
-  #
-  # Skip if config.yml inference.type=api in config.yaml
+  # Inference(Optional)
   #
   # inference:
   #   env_file: .env
@@ -55,9 +53,7 @@ services:
 
 # volumes:
 #   db-data:
-#     name: futurecast-db-data
 #   model-cache:
-#     name: futurecast-model-cache
 
 networks:
   futurecast:

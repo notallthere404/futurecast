@@ -3,5 +3,5 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("ng-tm CLI reserved for future Cobra commands")
+	fmt.Println("futurecast CLI reserved for future Cobra commands")
 }

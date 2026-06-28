@@ -22,7 +22,7 @@ import (
 
 const (
 	defaultTimeout = 30 * time.Second
-	defaultUA      = "ng-tm/1.0 (+https://github.com/notallthere/ng-tm)"
+	defaultUA      = "futurecast/1.0 (+https://github.com/notallthere404/futurecast)"
 )
 
 // Client wraps net/http.Client with default headers and retry policy.
