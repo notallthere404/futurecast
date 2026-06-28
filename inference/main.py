@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
@@ -18,10 +17,6 @@ from models import (
     InfoResponse,
     LoadRequest,
 )
-
-
-DEFAULT_MODEL = "MoritzLaurer/deberta-v3-base-zeroshot-v2.0"
-DEFAULT_TYPE = "zeroshot"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,36 +41,15 @@ def _build_classifier(classifier_type: str, model: str) -> Classifier:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load the model and mark live. Classification spec arrives
-    per-request, so nothing else is held on app state. Model id + type
-    come from env at boot; POST /load swaps them at runtime."""
-    app.state.health_status = "init"
+    """Boot in `idle`: no model loaded, no env-driven defaults. The Go
+    server reads config.yml and pushes the model via POST /load. Single
+    source of truth, no cold-boot dual load."""
+    app.state.health_status = "idle"
     app.state.deps = None
-    app.state.current_type = os.getenv("INFERENCE_TYPE", DEFAULT_TYPE)
-    app.state.current_model = os.getenv("INFERENCE_MODEL", DEFAULT_MODEL)
+    app.state.current_type = ""
+    app.state.current_model = ""
     app.state.load_lock = asyncio.Lock()
-
-    try:
-        log.info(
-            "loading model type=%s model=%s",
-            app.state.current_type, app.state.current_model,
-        )
-        # Off the event loop so uvicorn keeps answering /health while
-        # the model loads. Without this the socket accepts connections
-        # but reads block until load completes, looking like a hang to
-        # any caller (including the readiness-gate goroutine on the Go
-        # side).
-        classifier = await asyncio.to_thread(
-            _build_classifier,
-            app.state.current_type, app.state.current_model,
-        )
-        app.state.deps = AppState(classifier=classifier)
-        app.state.health_status = "live"
-        log.info("listening")
-    except Exception as e:
-        app.state.health_status = "error"
-        log.error("startup failed error=%s", e)
-
+    log.info("listening (idle, awaiting /load)")
     yield
     app.state.deps = None
 
@@ -87,7 +61,8 @@ app = FastAPI(lifespan=lifespan)
 def health(request: Request):
     status = getattr(request.app.state, "health_status", "init")
     body = HealthResponse(state=status, time=datetime.now().strftime("%H:%M:%S"))
-    if status != "live":
+    # idle and live are both "reachable"; init (mid-swap) and error are not.
+    if status not in ("idle", "live"):
         return JSONResponse(status_code=503, content=body.model_dump())
     return body
 
@@ -96,8 +71,8 @@ def health(request: Request):
 def info(request: Request):
     s = request.app.state
     return InfoResponse(
-        type=getattr(s, "current_type", DEFAULT_TYPE),
-        model=getattr(s, "current_model", DEFAULT_MODEL),
+        type=getattr(s, "current_type", ""),
+        model=getattr(s, "current_model", ""),
         state=getattr(s, "health_status", "init"),
     )
 

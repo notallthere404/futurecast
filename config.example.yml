@@ -34,18 +34,19 @@ inference:
   type: zeroshot
   engine: transformers
   addr: http://inference:8080
-  model: knowledgator/gliclass-base-v3.0
+  model: MoritzLaurer/deberta-v3-base-zeroshot-v2.0
   default:
     cutoff: 0.0
     top_n: 3
   events:
     - name: tactics
-      instruction: You are a cyber threat intelligence analyst. Determine if the document describes the following technical procedure, tactic, or vulnerability.
+      prompt: "This text describes the tactic: {}"
+      # instruction: ...     # LLM/api modes only; ignored by zeroshot
       # cutoff: 0.5          # overrides default.cutoff for this attribute
       # top_n: 5             # overrides default.top_n
-      labels: 
+      labels:
         - "Reconnaissance and Scanning"
-        - "Resource Development and Infrastructure" 
+        - "Resource Development and Infrastructure"
         - "Initial Access"
         - "Execution"
         - "Persistence and Account Controls"

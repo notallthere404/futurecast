@@ -62,17 +62,18 @@ class ClassifyResponseItem(BaseModel):
 # ── Health / info / load ────────────────────────────────────────────────────
 
 class HealthResponse(BaseModel):
-    state: Literal["init", "live", "error"]
+    state: Literal["init", "idle", "live", "error"]
     time: str
 
 
 class InfoResponse(BaseModel):
     """GET /info — what the service currently has loaded. The Go-side
     readiness goroutine compares this against the live config; a
-    mismatch fires POST /load."""
-    type: Literal["zeroshot", "llm"]
+    mismatch fires POST /load. Empty type+model means no model loaded
+    yet (boot-time idle state)."""
+    type: Literal["", "zeroshot", "llm"]
     model: str
-    state: Literal["init", "live", "error"]
+    state: Literal["init", "idle", "live", "error"]
 
 
 class LoadRequest(BaseModel):
